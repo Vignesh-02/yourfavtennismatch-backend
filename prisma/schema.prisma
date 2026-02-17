@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens       RefreshToken[]
+  userTop10BestOf5    UserTop10BestOf5Match[]
+  userTop10BestOf3    UserTop10BestOf3Match[]
+  userTop10Players    UserTop10Player[]
+  userTop5GSFinals    UserTop5GrandSlamFinal[]
+  userPicks           UserPicks?
+  forumsCreated      Forum[]
+  threads             Thread[]
+  posts               Post[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model Tournament {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  isGrandSlam Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  matches Match[]
+}
+
+model Player {
+  id           String   @id @default(uuid())
+  name         String
+  countryCode  String?
+  slug         String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  matchesAsPlayer1     Match[] @relation("Player1")
+  matchesAsPlayer2     Match[] @relation("Player2")
+  userTop10Players     UserTop10Player[]
+  userPicksAsFavorite  UserPicks? @relation("FavoritePlayer")
+}
+
+model Match {
+  id           String   @id @default(uuid())
+  tournamentId String
+  year         Int
+  round        String
+  isFinal      Boolean
+  bestOf       Int      // 3 or 5
+  category     String   // e.g. "men_singles", "women_singles"
+  player1Id    String?
+  player2Id    String?
+  score        String?
+  title        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Restrict)
+  player1      Player?    @relation("Player1", fields: [player1Id], references: [id], onDelete: SetNull)
+  player2      Player?    @relation("Player2", fields: [player2Id], references: [id], onDelete: SetNull)
+
+  userTop10BestOf5   UserTop10BestOf5Match[]
+  userTop10BestOf3   UserTop10BestOf3Match[]
+  userTop5GSFinals   UserTop5GrandSlamFinal[]
+  userPicksBestOf5   UserPicks? @relation("FavoriteBestOf5Match")
+  userPicksBestOf3   UserPicks? @relation("FavoriteBestOf3Match")
+  userPicksGSFinal   UserPicks? @relation("BestGrandSlamFinal")
+}
+
+model UserTop10BestOf5Match {
+  userId    String
+  matchId   String
+  position  Int // 1..10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@id([userId, position])
+  @@index([userId])
+}
+
+model UserTop10BestOf3Match {
+  userId    String
+  matchId   String
+  position  Int // 1..10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@id([userId, position])
+  @@index([userId])
+}
+
+model UserTop10Player {
+  userId   String
+  playerId String
+  position Int // 1..10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([userId, position])
+  @@index([userId])
+}
+
+model UserTop5GrandSlamFinal {
+  userId   String
+  matchId  String
+  position Int // 1..5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@id([userId, position])
+  @@index([userId])
+}
+
+model UserPicks {
+  userId                    String   @id
+  favoritePlayerId          String?
+  favoriteBestOf5MatchId   String?
+  favoriteBestOf3MatchId    String?
+  bestGrandSlamFinalMatchId String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  user                  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favoritePlayer        Player? @relation("FavoritePlayer", fields: [favoritePlayerId], references: [id], onDelete: SetNull)
+  favoriteBestOf5Match  Match?  @relation("FavoriteBestOf5Match", fields: [favoriteBestOf5MatchId], references: [id], onDelete: SetNull)
+  favoriteBestOf3Match  Match?  @relation("FavoriteBestOf3Match", fields: [favoriteBestOf3MatchId], references: [id], onDelete: SetNull)
+  bestGrandSlamFinal    Match?  @relation("BestGrandSlamFinal", fields: [bestGrandSlamFinalMatchId], references: [id], onDelete: SetNull)
+}
+
+model Forum {
+  id          String   @id @default(uuid())
+  createdById String
+  title       String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  threads Thread[]
+
+  @@index([createdById])
+}
+
+model Thread {
+  id        String   @id @default(uuid())
+  forumId   String
+  authorId  String
+  title     String
+  body      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  forum  Forum @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  author User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  posts  Post[]
+
+  @@index([forumId])
+  @@index([authorId])
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  threadId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([authorId])
+}

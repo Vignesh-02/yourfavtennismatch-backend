@@ -8,7 +8,7 @@ Backend API for **YourFavMatch**: a site where users log in to rank their favori
 
 ## Project flow
 
-### 1. User journey (high level)
+### 1. User journey (high level overview)
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────────────────────────────────┐

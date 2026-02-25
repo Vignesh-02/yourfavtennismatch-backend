@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { registerSchema, loginSchema, refreshSchema } from './auth.schema';
 import * as authService from './auth.service';
 

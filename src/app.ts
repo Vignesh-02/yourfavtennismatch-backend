@@ -1,4 +1,5 @@
-import Fastify from 'fastify';
+/// <reference path="./types/fastify.d.ts" />
+import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { config } from './config';
 import { toHttpError } from './lib/errors';
 import { authRoutes } from './modules/auth/auth.routes';
@@ -11,24 +12,26 @@ import { forumsRoutes } from './modules/forums/forums.routes';
 import { threadsRoutes } from './modules/forums/threads.routes';
 import { postsCreateRoutes, postsUpdateRoutes } from './modules/forums/posts.routes';
 
-async function build() {
-  const app = Fastify({
+async function build(): Promise<FastifyInstance> {
+  const app = fastify({
     logger: config.nodeEnv === 'development'
       ? { transport: { target: 'pino-pretty', options: { translateTime: 'HH:MM:ss Z' } } }
       : true,
   });
 
-  app.setErrorHandler((err, request, reply) => {
+  app.setErrorHandler((err, _request: FastifyRequest, reply: FastifyReply): void => {
     const { statusCode, message, code } = toHttpError(err);
-    if (err.validation) {
-      return reply.status(400).send({
+    const error = err as Error & { validation?: unknown };
+    if (error.validation) {
+      reply.status(400).send({
         statusCode: 400,
         error: 'Bad Request',
-        message: err.message,
+        message: error.message,
         code: 'VALIDATION_ERROR',
       });
+      return;
     }
-    return reply.status(statusCode).send({
+    reply.status(statusCode).send({
       statusCode,
       error: statusCode >= 500 ? 'Internal Server Error' : 'Error',
       message,
@@ -53,7 +56,9 @@ async function build() {
     { prefix: apiPrefix }
   );
 
-  app.get('/health', async (_, reply) => reply.send({ ok: true }));
+  app.get('/health', async (_req, reply) => {
+    reply.send({ ok: true });
+  });
 
   return app;
 }

@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { requireAuth } from '../../middleware/auth.middleware';
 import * as picksService from './picks.service';

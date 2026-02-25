@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -60,7 +59,7 @@ model Player {
   matchesAsPlayer1     Match[] @relation("Player1")
   matchesAsPlayer2     Match[] @relation("Player2")
   userTop10Players     UserTop10Player[]
-  userPicksAsFavorite  UserPicks? @relation("FavoritePlayer")
+  userPicksAsFavorite  UserPicks[] @relation("FavoritePlayer")
 }
 
 model Match {
@@ -85,9 +84,9 @@ model Match {
   userTop10BestOf5   UserTop10BestOf5Match[]
   userTop10BestOf3   UserTop10BestOf3Match[]
   userTop5GSFinals   UserTop5GrandSlamFinal[]
-  userPicksBestOf5   UserPicks? @relation("FavoriteBestOf5Match")
-  userPicksBestOf3   UserPicks? @relation("FavoriteBestOf3Match")
-  userPicksGSFinal   UserPicks? @relation("BestGrandSlamFinal")
+  userPicksBestOf5   UserPicks[] @relation("FavoriteBestOf5Match")
+  userPicksBestOf3   UserPicks[] @relation("FavoriteBestOf3Match")
+  userPicksGSFinal   UserPicks[] @relation("BestGrandSlamFinal")
 }
 
 model UserTop10BestOf5Match {

@@ -1,0 +1,466 @@
+{
+  "info": {
+    "name": "yourfavmatch",
+    "_postman_id": "yourfavmatch-api-collection",
+    "description": "YourFavMatch API — Tennis ranking, picks, and forum platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/health", "host": ["http://localhost:3000"], "path": ["health"] },
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"displayName\": \"Test User\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"] },
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] },
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "List Tournaments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tournaments?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments"],
+              "query": [
+                { "key": "isGrandSlam", "value": "true", "disabled": true },
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Get Tournament by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tournaments/:id", "host": ["{{baseUrl}}"], "path": ["tournaments", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Players",
+      "item": [
+        {
+          "name": "List Players",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/players?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["players"],
+              "query": [
+                { "key": "search", "value": "federer", "disabled": true },
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Get Player by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/players/:id", "host": ["{{baseUrl}}"], "path": ["players", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "List Matches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/matches?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["matches"],
+              "query": [
+                { "key": "tournamentId", "value": "", "disabled": true },
+                { "key": "year", "value": "2008", "disabled": true },
+                { "key": "bestOf", "value": "5", "disabled": true },
+                { "key": "isFinal", "value": "true", "disabled": true },
+                { "key": "category", "value": "men_singles", "disabled": true },
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Get Match by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/matches/:id", "host": ["{{baseUrl}}"], "path": ["matches", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rankings",
+      "item": [
+        {
+          "name": "Get Best-of-5 Rankings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/me/rankings/best-of-5", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "best-of-5"] }
+          }
+        },
+        {
+          "name": "Set Best-of-5 Rankings",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/me/rankings/best-of-5", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "best-of-5"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matchIds\": [\n    \"00000000-0000-0000-0000-000000000001\",\n    \"00000000-0000-0000-0000-000000000002\",\n    \"00000000-0000-0000-0000-000000000003\",\n    \"00000000-0000-0000-0000-000000000005\"\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Best-of-3 Rankings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/me/rankings/best-of-3", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "best-of-3"] }
+          }
+        },
+        {
+          "name": "Set Best-of-3 Rankings",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/me/rankings/best-of-3", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "best-of-3"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matchIds\": [\n    \"00000000-0000-0000-0000-000000000004\"\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Players Rankings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/me/rankings/players", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "players"] }
+          }
+        },
+        {
+          "name": "Set Players Rankings",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/me/rankings/players", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "players"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerIds\": [\n    \"<player-uuid-1>\",\n    \"<player-uuid-2>\"\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Grand Slam Finals Rankings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/me/rankings/grand-slam-finals", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "grand-slam-finals"] }
+          }
+        },
+        {
+          "name": "Set Grand Slam Finals Rankings",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/me/rankings/grand-slam-finals", "host": ["{{baseUrl}}"], "path": ["me", "rankings", "grand-slam-finals"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matchIds\": [\n    \"00000000-0000-0000-0000-000000000001\",\n    \"00000000-0000-0000-0000-000000000002\",\n    \"00000000-0000-0000-0000-000000000003\",\n    \"00000000-0000-0000-0000-000000000005\"\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Picks",
+      "item": [
+        {
+          "name": "Get My Picks",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/me/picks", "host": ["{{baseUrl}}"], "path": ["me", "picks"] }
+          }
+        },
+        {
+          "name": "Set My Picks",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "{{baseUrl}}/me/picks", "host": ["{{baseUrl}}"], "path": ["me", "picks"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"favoritePlayerId\": \"<player-uuid>\",\n  \"favoriteBestOf5MatchId\": \"00000000-0000-0000-0000-000000000001\",\n  \"favoriteBestOf3MatchId\": \"00000000-0000-0000-0000-000000000004\",\n  \"bestGrandSlamFinalMatchId\": \"00000000-0000-0000-0000-000000000003\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Forums",
+      "item": [
+        {
+          "name": "List Forums",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/forums?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["forums"],
+              "query": [
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Get Forum by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/forums/:id", "host": ["{{baseUrl}}"], "path": ["forums", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Create Forum",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/forums", "host": ["{{baseUrl}}"], "path": ["forums"] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Best Matches of All Time\",\n  \"description\": \"Discuss the greatest tennis matches ever played\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Forum",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/forums/:id", "host": ["{{baseUrl}}"], "path": ["forums", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Forum Title\",\n  \"description\": \"Updated description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Forum Threads",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/forums/:id/threads?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["forums", ":id", "threads"],
+              "variable": [{ "key": "id", "value": "" }],
+              "query": [
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Create Thread in Forum",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/forums/:id/threads", "host": ["{{baseUrl}}"], "path": ["forums", ":id", "threads"], "variable": [{ "key": "id", "value": "" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"2008 Wimbledon Final Discussion\",\n  \"body\": \"What a match between Federer and Nadal! What are your thoughts?\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Threads",
+      "item": [
+        {
+          "name": "Get Thread with Posts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/threads/:id?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["threads", ":id"],
+              "variable": [{ "key": "id", "value": "" }],
+              "query": [
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post in Thread",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/threads/:id/posts", "host": ["{{baseUrl}}"], "path": ["threads", ":id", "posts"], "variable": [{ "key": "id", "value": "" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"I agree, it was one of the greatest matches in tennis history!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/posts/:id", "host": ["{{baseUrl}}"], "path": ["posts", ":id"], "variable": [{ "key": "id", "value": "" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Updated: I agree, it was one of the greatest matches in tennis history!\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

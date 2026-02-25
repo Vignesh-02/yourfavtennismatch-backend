@@ -1,7 +1,13 @@
-import { User } from '@prisma/client';
+import 'fastify';
 
 declare module 'fastify' {
   interface FastifyRequest {
-    user?: User;
+    user?: {
+      id: string;
+      email: string;
+      displayName: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
   }
 }

@@ -1,17 +1,26 @@
 import argon2 from 'argon2';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { prisma } from '../../db/client';
 import { AppError } from '../../lib/errors';
 import { config } from '../../config';
 import type { RegisterBody, LoginBody } from './auth.schema';
-import type { User } from '@prisma/client';
+
+type AuthUser = {
+  id: string;
+  email: string;
+  displayName: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
-export async function register(body: RegisterBody): Promise<{ user: User; accessToken: string; refreshToken: string; expiresIn: string }> {
+export async function register(
+  body: RegisterBody
+): Promise<{ user: AuthUser; accessToken: string; refreshToken: string; expiresIn: string }> {
   const existing = await prisma.user.findUnique({ where: { email: body.email } });
   if (existing) throw new AppError(409, 'Email already registered', 'EMAIL_EXISTS');
 
@@ -26,13 +35,13 @@ export async function register(body: RegisterBody): Promise<{ user: User; access
 
   const accessToken = jwt.sign(
     { sub: user.id },
-    config.jwt.accessSecret,
-    { expiresIn: config.jwt.accessExpiresIn }
+    config.jwt.accessSecret as Secret,
+    { expiresIn: config.jwt.accessExpiresIn } as SignOptions
   );
   const refreshToken = jwt.sign(
     { sub: user.id, type: 'refresh' },
-    config.jwt.refreshSecret,
-    { expiresIn: config.jwt.refreshExpiresIn }
+    config.jwt.refreshSecret as Secret,
+    { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
   );
   const refreshExpiresAt = new Date();
   refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);
@@ -45,14 +54,22 @@ export async function register(body: RegisterBody): Promise<{ user: User; access
   });
 
   return {
-    user: { id: user.id, email: user.email, displayName: user.displayName, passwordHash: user.passwordHash, createdAt: user.createdAt, updatedAt: user.updatedAt },
+    user: {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
     accessToken,
     refreshToken,
     expiresIn: config.jwt.accessExpiresIn,
   };
 }
 
-export async function login(body: LoginBody): Promise<{ user: User; accessToken: string; refreshToken: string; expiresIn: string }> {
+export async function login(
+  body: LoginBody
+): Promise<{ user: AuthUser; accessToken: string; refreshToken: string; expiresIn: string }> {
   const user = await prisma.user.findUnique({ where: { email: body.email } });
   if (!user) throw new AppError(401, 'Invalid email or password');
   const valid = await argon2.verify(user.passwordHash, body.password);
@@ -60,13 +77,13 @@ export async function login(body: LoginBody): Promise<{ user: User; accessToken:
 
   const accessToken = jwt.sign(
     { sub: user.id },
-    config.jwt.accessSecret,
-    { expiresIn: config.jwt.accessExpiresIn }
+    config.jwt.accessSecret as Secret,
+    { expiresIn: config.jwt.accessExpiresIn } as SignOptions
   );
   const refreshToken = jwt.sign(
     { sub: user.id, type: 'refresh' },
-    config.jwt.refreshSecret,
-    { expiresIn: config.jwt.refreshExpiresIn }
+    config.jwt.refreshSecret as Secret,
+    { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
   );
   const refreshExpiresAt = new Date();
   refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);
@@ -79,7 +96,13 @@ export async function login(body: LoginBody): Promise<{ user: User; accessToken:
   });
 
   return {
-    user: { id: user.id, email: user.email, displayName: user.displayName, passwordHash: user.passwordHash, createdAt: user.createdAt, updatedAt: user.updatedAt },
+    user: {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
     accessToken,
     refreshToken,
     expiresIn: config.jwt.accessExpiresIn,
@@ -87,7 +110,7 @@ export async function login(body: LoginBody): Promise<{ user: User; accessToken:
 }
 
 export async function refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string; expiresIn: string }> {
-  const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret) as { sub: string; type?: string };
+  const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret as Secret) as { sub: string; type?: string };
   if (decoded.type !== 'refresh') throw new AppError(401, 'Invalid refresh token');
 
   const tokenHash = hashToken(refreshToken);
@@ -105,13 +128,13 @@ export async function refresh(refreshToken: string): Promise<{ accessToken: stri
   const user = stored.user;
   const newAccessToken = jwt.sign(
     { sub: user.id },
-    config.jwt.accessSecret,
-    { expiresIn: config.jwt.accessExpiresIn }
+    config.jwt.accessSecret as Secret,
+    { expiresIn: config.jwt.accessExpiresIn } as SignOptions
   );
   const newRefreshToken = jwt.sign(
     { sub: user.id, type: 'refresh' },
-    config.jwt.refreshSecret,
-    { expiresIn: config.jwt.refreshExpiresIn }
+    config.jwt.refreshSecret as Secret,
+    { expiresIn: config.jwt.refreshExpiresIn } as SignOptions
   );
   const refreshExpiresAt = new Date();
   refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);

@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { prisma } from '../../db/client';
 import { AppError } from '../../lib/errors';
 
@@ -15,17 +15,6 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
           category: { type: 'string' },
           limit: { type: 'integer', minimum: 1, maximum: 100 },
           offset: { type: 'integer', minimum: 0 },
-        },
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            data: {
-              type: 'array',
-              items: { type: 'object' },
-            },
-          },
         },
       },
     },
@@ -71,7 +60,6 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Params: { id: string } }>('/:id', {
     schema: {
       params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-      response: { 200: { type: 'object' } },
     },
     handler: async (req, reply) => {
       const match = await prisma.match.findUnique({

@@ -14,7 +14,8 @@
     "db:push": "prisma db push",
     "db:seed": "ts-node-dev prisma/seed.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   },
   "prisma": {
     "seed": "ts-node-dev prisma/seed.ts"
@@ -36,12 +37,15 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.3",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
     "eslint": "^10.0.0",
+    "husky": "^9.1.7",
     "nodemon": "^3.1.14",
     "prisma": "^7.4.0",
     "supertest": "^7.2.2",

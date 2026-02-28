@@ -1,0 +1,17 @@
+[
+  { "name": "Australian Open", "slug": "australian-open", "isGrandSlam": true },
+  { "name": "French Open", "slug": "french-open", "isGrandSlam": true },
+  { "name": "Wimbledon", "slug": "wimbledon", "isGrandSlam": true },
+  { "name": "US Open", "slug": "us-open", "isGrandSlam": true },
+  { "name": "Indian Wells Masters", "slug": "indian-wells", "isGrandSlam": false },
+  { "name": "Miami Open", "slug": "miami", "isGrandSlam": false },
+  { "name": "Monte Carlo Masters", "slug": "monte-carlo", "isGrandSlam": false },
+  { "name": "Madrid Open", "slug": "madrid", "isGrandSlam": false },
+  { "name": "Italian Open", "slug": "rome", "isGrandSlam": false },
+  { "name": "Canadian Open", "slug": "canadian-open", "isGrandSlam": false },
+  { "name": "Cincinnati Masters", "slug": "cincinnati", "isGrandSlam": false },
+  { "name": "Shanghai Masters", "slug": "shanghai", "isGrandSlam": false },
+  { "name": "Paris Masters", "slug": "paris", "isGrandSlam": false },
+  { "name": "Hamburg Masters", "slug": "hamburg", "isGrandSlam": false },
+  { "name": "Key Biscayne Masters", "slug": "key-biscayne", "isGrandSlam": false }
+]

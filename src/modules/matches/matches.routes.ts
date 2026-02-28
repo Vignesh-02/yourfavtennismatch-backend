@@ -74,4 +74,61 @@ export async function matchesRoutes(app: FastifyInstance): Promise<void> {
       return reply.send(match);
     },
   });
+
+  app.get<{ Params: { playerId: string } }>('/player/:playerId', {
+    schema: {
+      params: { type: 'object', required: ['playerId'], properties: { playerId: { type: 'string' } } },
+    },
+    handler: async (req, reply) => {
+      const { playerId } = req.params;
+      const matches = await prisma.match.findMany({
+        where: {
+          OR: [
+            { player1Id: playerId },
+            { player2Id: playerId },
+          ],
+        },
+        orderBy: [{ year: 'desc' }, { createdAt: 'desc' }],
+        include: {
+          tournament: { select: { id: true, name: true, slug: true, isGrandSlam: true } },
+          player1: { select: { id: true, name: true, slug: true, countryCode: true } },
+          player2: { select: { id: true, name: true, slug: true, countryCode: true } },
+        },
+      });
+      if (matches.length === 0) throw new AppError(404, 'No matches found for this player');
+      return reply.send({ count: matches.length, data: matches });
+    },
+  });
+
+
+  app.get<{ Params: { slug: string } }>('/player/slug/:slug', {
+    schema: {
+      params: { type: 'object', required: ['slug'], properties: { slug: { type: 'string' } } },
+    },
+    handler: async (req, reply) => {
+      const player = await prisma.player.findUnique({
+        where: { slug: req.params.slug },
+        select: { id: true },
+      });
+      if (!player) throw new AppError(404, 'Player not found');
+      const matches = await prisma.match.findMany({
+        where: {
+          OR: [
+            { player1Id: player.id },
+            { player2Id: player.id },
+          ],
+        },
+        orderBy: [{ year: 'desc' }, { createdAt: 'desc' }],
+        include: {
+          tournament: { select: { id: true, name: true, slug: true, isGrandSlam: true } },
+          player1: { select: { id: true, name: true, slug: true, countryCode: true } },
+          player2: { select: { id: true, name: true, slug: true, countryCode: true } },
+        },
+      });
+      return reply.send({ count: matches.length, data: matches });
+    },
+  });
+
+
+
 }

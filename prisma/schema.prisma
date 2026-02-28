@@ -7,7 +7,7 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String   @id @default(uuid(7))
   email        String   @unique
   passwordHash String
   displayName  String?
@@ -26,7 +26,7 @@ model User {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   userId    String
   tokenHash String
   expiresAt DateTime
@@ -38,7 +38,7 @@ model RefreshToken {
 }
 
 model Tournament {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid(7))
   name        String
   slug        String   @unique
   isGrandSlam Boolean  @default(false)
@@ -49,7 +49,7 @@ model Tournament {
 }
 
 model Player {
-  id           String   @id @default(uuid())
+  id           String   @id @default(uuid(7))
   name         String
   countryCode  String?
   slug         String   @unique
@@ -63,7 +63,7 @@ model Player {
 }
 
 model Match {
-  id           String   @id @default(uuid())
+  id           String   @id @default(uuid(7))
   tournamentId String
   year         Int
   round        String
@@ -88,6 +88,7 @@ model Match {
   userPicksBestOf3   UserPicks[] @relation("FavoriteBestOf3Match")
   userPicksGSFinal   UserPicks[] @relation("BestGrandSlamFinal")
 }
+
 
 model UserTop10BestOf5Match {
   userId    String
@@ -162,7 +163,7 @@ model UserPicks {
 }
 
 model Forum {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid(7))
   createdById String
   title       String
   slug        String   @unique
@@ -177,7 +178,7 @@ model Forum {
 }
 
 model Thread {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   forumId   String
   authorId  String
   title     String
@@ -194,7 +195,7 @@ model Thread {
 }
 
 model Post {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   threadId  String
   authorId  String
   body      String
